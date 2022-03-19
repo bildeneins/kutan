@@ -87,7 +87,7 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
       newFaculty,
       newSearchQuery,
       newSkipNum
-                           }: {
+  }: {
     newFaculty?: { id: number, name: string } | undefined,
     newSearchQuery?: string,
     newSkipNum?: number
@@ -121,7 +121,7 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
                       : faculties.find((f: any) => f.id.toString() === val)
     setFaculty(faculty)
     setSkipNum(0)
-    pushRoute({ newFaculty: faculty ? faculty : undefined })
+    pushRoute({ newSkipNum: 0, newFaculty: faculty ? faculty : undefined })
   }
 
   return (

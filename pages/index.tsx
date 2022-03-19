@@ -88,7 +88,7 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
       newSearchQuery,
       newSkipNum
   }: {
-    newFaculty?: { id: number, name: string } | undefined,
+    newFaculty: { id: number, name: string } | undefined,
     newSearchQuery?: string,
     newSkipNum?: number
   }) => {
@@ -98,7 +98,7 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
         skip: newSkipNum !== undefined ? newSkipNum : skipNum,
         searchQuery: newSearchQuery ? newSearchQuery : searchQuery,
         faculty: newFaculty ? newFaculty.id
-                            : faculty ? faculty.id : undefined
+                            : undefined
       }
     })
   }
@@ -106,13 +106,13 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
   const search = async () => {
     const newSkipNum = 0
     setSkipNum(newSkipNum)
-    await pushRoute({ newSkipNum })
+    await pushRoute({ newSkipNum, newFaculty: faculty  })
   }
 
   const onChangePage = async (val: number) => {
     const newSkipNum = 10 * (val - 1)
     setSkipNum(newSkipNum)
-    await pushRoute({ newSkipNum })
+    await pushRoute({ newSkipNum, newFaculty: faculty })
   }
 
   // val: 'all' | '0' | '1' | ...
@@ -187,6 +187,7 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
         <Grid.Container justify="center">
           <Grid>
             <Pagination
+                page={(skipNum / 10) + 1}
                 count={paginationNum}
                 onChange={onChangePage}
             >

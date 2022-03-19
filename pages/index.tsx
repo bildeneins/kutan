@@ -121,11 +121,13 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
       </Page.Header>
       <Page.Content>
         <Grid.Container>
-          <Grid xs={4}><Input
+          <Grid>
+            <Input
               {...bindings}
-          /></Grid>
+            />
+          </Grid>
           <Spacer w={1}/>
-          <Grid xs={4}>
+          <Grid>
             <Button
               onClick={search}
               scale={3/4}
@@ -168,23 +170,23 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
                           }}
             />
           </Table>
-          <Spacer h={1}/>
-          <Grid.Container justify="center">
-            <Grid>
-              <Pagination
-                  count={paginationNum}
-                  onChange={onChangePage}
-              >
-                <Pagination.Next>
-                  <ChevronRight />
-                </Pagination.Next>
-                <Pagination.Previous>
-                  <ChevronLeft />
-                </Pagination.Previous>
-              </Pagination>
-            </Grid>
-          </Grid.Container>
         </Card>
+        <Spacer h={1}/>
+        <Grid.Container justify="center">
+          <Grid>
+            <Pagination
+                count={paginationNum}
+                onChange={onChangePage}
+            >
+              <Pagination.Next>
+                <ChevronRight />
+              </Pagination.Next>
+              <Pagination.Previous>
+                <ChevronLeft />
+              </Pagination.Previous>
+            </Pagination>
+          </Grid>
+        </Grid.Container>
       </Page.Content>
       <Page.Footer>
         <Text p>2022</Text>

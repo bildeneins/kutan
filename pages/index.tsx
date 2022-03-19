@@ -1,5 +1,17 @@
 import type { GetServerSideProps, NextPage } from 'next'
-import { Button, Card, Grid, Input, Page, Pagination, Select, Spacer, Table, Text, useInput } from '@geist-ui/core'
+import {
+  Card,
+  Divider,
+  Grid,
+  Input,
+  Page,
+  Pagination,
+  Select,
+  Spacer,
+  Table,
+  Text,
+  useInput
+} from '@geist-ui/core'
 import prisma from '../lib/prisma'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -113,33 +125,33 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
   }
 
   return (
-    <Page width="100%">
+    <Page
+        width="100%"
+        dotBackdrop={true}
+        dotSize="2px"
+        dotSpace={.5}
+    >
       <Page.Header>
-        <div>
-          <Text h1>KUTAN - 京大単位取得率</Text>
-        </div>
+        <Text h2>
+          <span style={{display: "inline-block"}}>KUTAN</span>
+          <span style={{display: "inline-block"}}>- 京大単位取得率</span>
+        </Text>
       </Page.Header>
-      <Page.Content>
-        <Grid.Container>
-          <Grid>
-            <Input
-              {...bindings}
-            />
-          </Grid>
-          <Spacer w={1}/>
-          <Grid>
-            <Button
-              onClick={search}
-              scale={3/4}
-              icon={<Search />}
-              auto
-            >
-              Search
-            </Button>
-          </Grid>
-        </Grid.Container>
+      <Divider />
+      <Page.Content
+          pt={.5}
+      >
+        <Input
+            placeholder={'科目名を検索...'}
+            scale={1.5}
+            {...bindings}
+            iconRight={<Search />}
+            iconClickable={true}
+            onIconClick={search}
+        />
         <Spacer h={1} />
         <Select
+            scale={1.5}
             placeholder={'開講部局'}
             onChange={handleSelect}
         >

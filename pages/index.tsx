@@ -95,7 +95,7 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
     await router.push({
       pathname: "/",
       query: {
-        skip: newSkipNum ? newSkipNum : skipNum,
+        skip: newSkipNum !== undefined ? newSkipNum : skipNum,
         searchQuery: newSearchQuery ? newSearchQuery : searchQuery,
         faculty: newFaculty ? newFaculty.id
                             : faculty ? faculty.id : undefined

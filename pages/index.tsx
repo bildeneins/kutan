@@ -113,7 +113,7 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
   }
 
   return (
-    <Page>
+    <Page width="100%">
       <Page.Header>
         <div>
           <Text h1>KUTAN - 京大単位取得率</Text>

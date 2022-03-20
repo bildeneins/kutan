@@ -17,53 +17,29 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {ChevronLeft, ChevronRight, Search} from '@geist-ui/icons'
 
-interface SubjectWhereInput {
-  name?: {
-    startsWith: string
-  },
-  faculty?: {
-    id: number
-  }
-}
-
 export const getServerSideProps
     : GetServerSideProps<{
         subjects: any,
-        counts: number,
         faculties: any[]
       }>
     = async ({ query }) => {
-  const skip = (query.skip !== undefined) ? parseInt(query.skip as string) : 0
-  const where: SubjectWhereInput = {
-    name: query.searchQuery ? {
-      startsWith: query.searchQuery as string
-    } : undefined,
-    faculty: query.faculty != undefined && query.faculty != '' ? {
-      id: parseInt(query.faculty as string)
-    } : undefined
-  }
-  const subjects = await prisma.subject.findMany({
-    skip,
-    take: 10,
-    include: {
-      faculty: true
-    },
-    where
-  })
-  const counts = await prisma.subject.count({
-    where
-  })
+  const subjects = query.faculty != undefined && query.faculty != ''
+                    ? query.searchQuery ? await prisma.$queryRaw`SELECT * FROM "Subject" WHERE name &@~ ${query.searchQuery} AND "facultyId" = ${parseInt(query.faculty as string)};`
+                                        : await prisma.$queryRaw`SELECT * FROM "Subject" WHERE "facultyId" = ${parseInt(query.faculty as string)};`
+                    : query.searchQuery ? await prisma.$queryRaw`SELECT * FROM "Subject" WHERE name &@~ ${query.searchQuery};`
+                                        : await prisma.$queryRaw`SELECT * FROM "Subject";`
+
   const faculties = await prisma.faculty.findMany()
+
   return {
     props: {
       subjects,
-      counts,
       faculties
     }
   }
 }
 
-const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ subjects, counts, faculties }: { subjects: any, counts: number, faculties: any[] }) => {
+const Home: NextPage<{ subjects: any, faculties: any[] }> = ({ subjects, faculties }: { subjects: any, faculties: any[] }) => {
   const router = useRouter()
   const [skipNum, setSkipNum] = useState(0)
   const [faculty, setFaculty] = useState<undefined | { id: number, name: string }>(undefined)
@@ -72,30 +48,29 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
     bindings
   } = useInput('')
 
+  const counts = subjects.length
+
   const paginationNum = Math.ceil(counts / 10)
 
-  const formattedSubjects = subjects.map((i: any) => {
+  const formattedSubjects = subjects.slice(skipNum, skipNum + 10).map((i: any) => {
     return {
       id: i.id,
       name: i.name,
-      facultyName: i.faculty.name,
+      facultyName: faculties.find(f => f.id === i.facultyId).name,
       percentage: Math.floor(1000 * i.earnSum / i.registerSum) / 10
     }
   })
 
   const pushRoute = async ({
       newFaculty,
-      newSearchQuery,
-      newSkipNum
+      newSearchQuery
   }: {
     newFaculty: { id: number, name: string } | undefined,
-    newSearchQuery?: string,
-    newSkipNum?: number
+    newSearchQuery?: string
   }) => {
     await router.push({
       pathname: "/",
       query: {
-        skip: newSkipNum !== undefined ? newSkipNum : skipNum,
         searchQuery: newSearchQuery ? newSearchQuery : searchQuery,
         faculty: newFaculty ? newFaculty.id
                             : undefined
@@ -106,13 +81,12 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
   const search = async () => {
     const newSkipNum = 0
     setSkipNum(newSkipNum)
-    await pushRoute({ newSkipNum, newFaculty: faculty  })
+    await pushRoute({ newFaculty: faculty  })
   }
 
   const onChangePage = async (val: number) => {
     const newSkipNum = 10 * (val - 1)
     setSkipNum(newSkipNum)
-    await pushRoute({ newSkipNum, newFaculty: faculty })
   }
 
   // val: 'all' | '0' | '1' | ...
@@ -121,7 +95,7 @@ const Home: NextPage<{ subjects: any, counts: number, faculties: any[] }> = ({ s
                       : faculties.find((f: any) => f.id.toString() === val)
     setFaculty(faculty)
     setSkipNum(0)
-    pushRoute({ newSkipNum: 0, newFaculty: faculty ? faculty : undefined })
+    pushRoute({ newFaculty: faculty ? faculty : undefined })
   }
 
   return (
